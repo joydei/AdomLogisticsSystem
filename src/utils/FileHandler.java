@@ -2,6 +2,7 @@ package utils;
 
 import models.Vehicle;
 import models.Driver;
+import models.Delivery;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -11,6 +12,7 @@ public class FileHandler {
 
     private static final String VEHICLE_FILE = "data/vehicles.txt";
     private static final String DRIVER_FILE = "data/drivers.txt";
+    private static final String DELIVERY_FILE = "data/deliveries.txt";
 
     // === VEHICLES ===
 
@@ -147,11 +149,83 @@ public class FileHandler {
             int infractions = Integer.parseInt(parts[4]);
 
             Driver d = new Driver(id, name, exp);
-            // Manually update delay and infraction counts
             for (int i = 0; i < delays; i++) d.addDelay();
             for (int i = 0; i < infractions; i++) d.addInfraction();
+
             return d;
 
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    // === DELIVERIES ===
+
+    public static void saveDeliveries(List<Delivery> deliveries) {
+        try {
+            ensureDataDirectory();
+
+            try (BufferedWriter writer = new BufferedWriter(new FileWriter(DELIVERY_FILE))) {
+                for (Delivery d : deliveries) {
+                    writer.write(formatDelivery(d));
+                    writer.newLine();
+                }
+                System.out.println("✅ Deliveries saved to " + DELIVERY_FILE);
+            }
+
+        } catch (IOException e) {
+            System.out.println("❌ Error saving deliveries: " + e.getMessage());
+        }
+    }
+
+    public static List<Delivery> loadDeliveries() {
+        List<Delivery> deliveries = new ArrayList<>();
+        File file = new File(DELIVERY_FILE);
+
+        if (!file.exists()) {
+            System.out.println("📂 No existing deliveries file found. Starting fresh.");
+            return deliveries;
+        }
+
+        try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                Delivery d = parseDelivery(line);
+                if (d != null) deliveries.add(d);
+            }
+        } catch (IOException e) {
+            System.out.println("❌ Error loading deliveries: " + e.getMessage());
+        }
+
+        return deliveries;
+    }
+
+    private static String formatDelivery(Delivery d) {
+        return String.join(",",
+                d.getPackageId(),
+                d.getOrigin(),
+                d.getDestination(),
+                d.getEta(),
+                d.getVehicleRegNo(),
+                d.getDriverId(),
+                d.getStatus()
+        );
+    }
+
+    private static Delivery parseDelivery(String line) {
+        String[] parts = line.split(",");
+        if (parts.length != 7) return null;
+
+        try {
+            return new Delivery(
+                    parts[0], // packageId
+                    parts[1], // origin
+                    parts[2], // destination
+                    parts[3], // eta
+                    parts[4], // vehicle
+                    parts[5], // driver
+                    parts[6]  // status
+            );
         } catch (Exception e) {
             return null;
         }

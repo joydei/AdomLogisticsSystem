@@ -1,0 +1,6 @@
+packageId,origin,destination,eta,vehicleRegNo,driverId,status
+PKG001,Tema,Accra,2025-07-05 10:00,VH001,DRV001,Delivered
+PKG002,Accra,Kumasi,2025-07-06 14:30,VH002,DRV002,In-Transit
+PKG003,Takoradi,Tema,2025-07-07 09:00,VH003,DRV003,Delivered
+PKG004,Koforidua,Ho,2025-07-08 11:45,VH004,DRV004,Pending
+PKG005,Sunyani,Bolgatanga,2025-07-09 16:00,VH005,DRV005,In-Transit

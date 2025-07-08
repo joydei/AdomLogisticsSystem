@@ -100,4 +100,14 @@ public class VehicleManager {
     public Vehicle getVehicleByRegNo(String regNo) {
         return vehicleTable.get(regNo);
     }
+
+    // ** New method to get any available vehicle (example implementation) **
+    public Vehicle getAvailableVehicle() {
+        // Simple example: return the first vehicle found in the hash table
+        List<Vehicle> allVehicles = vehicleTable.toList();
+        if (!allVehicles.isEmpty()) {
+            return allVehicles.get(0);
+        }
+        return null; // no vehicle available
+    }
 }

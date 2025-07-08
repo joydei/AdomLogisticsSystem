@@ -2,6 +2,7 @@ package cli;
 
 import modules.VehicleManager;
 import modules.DriverManager;
+import modules.DeliveryManager;
 
 import java.util.Scanner;
 
@@ -9,7 +10,8 @@ public class MainMenu {
 
     private final Scanner scanner = new Scanner(System.in);
     private final VehicleManager vehicleManager = new VehicleManager();
-    private final DriverManager driverManager = new DriverManager(); // 
+    private final DriverManager driverManager = new DriverManager();
+    private final DeliveryManager deliveryManager = new DeliveryManager(driverManager, vehicleManager);
     private boolean running = true;
 
     public void launch() {
@@ -73,7 +75,7 @@ public class MainMenu {
                 case "2" -> vehicleManager.listVehicles();
                 case "3" -> vehicleManager.searchVehicle();
                 case "4" -> vehicleManager.listVehiclesSortedByMileage();
-                case "5" -> vehicleManager.searchByMileage(); 
+                case "5" -> vehicleManager.searchByMileage();
                 case "6" -> inVehicleMenu = false;
                 default -> System.out.println("Invalid input. Please try again.");
             }
@@ -108,8 +110,30 @@ public class MainMenu {
     }
 
     private void trackDeliveries() {
-        System.out.println("\n--- Delivery Tracking Module ---");
-        System.out.println("This will handle delivery tracking and rerouting.");
+        boolean inDeliveryMenu = true;
+
+        while (inDeliveryMenu) {
+            System.out.println("\n--- Delivery Tracking ---");
+            System.out.println("1. Add New Delivery");
+            System.out.println("2. View All Deliveries");
+            System.out.println("3. Search Delivery by Package ID");
+            System.out.println("4. Update Delivery Status");
+            System.out.println("5. Reroute Delivery");
+            System.out.println("6. Back to Main Menu");
+            System.out.print("Enter your choice (1-6): ");
+
+            String input = scanner.nextLine().trim();
+
+            switch (input) {
+                case "1" -> deliveryManager.addDelivery();
+                case "2" -> deliveryManager.listDeliveries();
+                case "3" -> deliveryManager.searchByPackageId();
+                case "4" -> deliveryManager.updateDeliveryStatus();
+                case "5" -> deliveryManager.rerouteDelivery();
+                case "6" -> inDeliveryMenu = false;
+                default -> System.out.println("Invalid input. Please try again.");
+            }
+        }
     }
 
     private void scheduleMaintenance() {
