@@ -23,11 +23,11 @@ public class FileHandler {
                     writer.write(formatVehicle(v));
                     writer.newLine();
                 }
-                System.out.println("✅ Vehicles saved to " + VEHICLE_FILE);
+                System.out.println("Vehicles saved to " + VEHICLE_FILE);
             }
 
         } catch (IOException e) {
-            System.out.println("❌ Error saving vehicles: " + e.getMessage());
+            System.out.println("Error saving vehicles: " + e.getMessage());
         }
     }
 
@@ -37,7 +37,7 @@ public class FileHandler {
         File file = new File(VEHICLE_FILE);
 
         if (!file.exists()) {
-            System.out.println("ℹ️ No existing vehicle file found. Starting fresh.");
+            System.out.println("No existing vehicle file found. Starting fresh.");
             return vehicles;
         }
 
@@ -50,7 +50,7 @@ public class FileHandler {
                 }
             }
         } catch (IOException e) {
-            System.out.println("❌ Error loading vehicles: " + e.getMessage());
+            System.out.println("Error loading vehicles: " + e.getMessage());
         }
 
         return vehicles;
