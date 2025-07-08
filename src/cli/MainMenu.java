@@ -1,12 +1,15 @@
 package cli;
 
 import modules.VehicleManager;
+import modules.DriverManager;
+
 import java.util.Scanner;
 
 public class MainMenu {
 
     private final Scanner scanner = new Scanner(System.in);
-    private final VehicleManager vehicleManager = new VehicleManager(); // Added vehicle manager
+    private final VehicleManager vehicleManager = new VehicleManager();
+    private final DriverManager driverManager = new DriverManager(); // 
     private boolean running = true;
 
     public void launch() {
@@ -78,26 +81,44 @@ public class MainMenu {
     }
 
     private void manageDrivers() {
-        System.out.println("\n--- Driver Management Module ---");
-        // TODO: Call DriverManager logic here
-        System.out.println("This will manage drivers and assignments.");
+        boolean inDriverMenu = true;
+
+        while (inDriverMenu) {
+            System.out.println("\n--- Driver Management ---");
+            System.out.println("1. Add New Driver");
+            System.out.println("2. View All Drivers");
+            System.out.println("3. Search Driver by ID");
+            System.out.println("4. Assign Next Available Driver");
+            System.out.println("5. Show Available Drivers Queue");
+            System.out.println("6. Back to Main Menu");
+            System.out.print("Enter your choice (1-6): ");
+
+            String input = scanner.nextLine().trim();
+
+            switch (input) {
+                case "1" -> driverManager.addDriver();
+                case "2" -> driverManager.listDrivers();
+                case "3" -> driverManager.searchDriverById();
+                case "4" -> driverManager.assignDriver();
+                case "5" -> driverManager.showAvailableDrivers();
+                case "6" -> inDriverMenu = false;
+                default -> System.out.println("Invalid input. Please try again.");
+            }
+        }
     }
 
     private void trackDeliveries() {
         System.out.println("\n--- Delivery Tracking Module ---");
-        // TODO: Call DeliveryManager logic here
         System.out.println("This will handle delivery tracking and rerouting.");
     }
 
     private void scheduleMaintenance() {
         System.out.println("\n--- Maintenance Scheduling Module ---");
-        // TODO: Call MaintenanceManager logic here
         System.out.println("This will schedule and log vehicle maintenance.");
     }
 
     private void generateReports() {
         System.out.println("\n--- Fuel Efficiency and System Reports ---");
-        // TODO: Call ReportGenerator logic here
         System.out.println("This will generate reports on fuel and usage.");
     }
 

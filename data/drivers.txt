@@ -1,0 +1,17 @@
+DriverID,Name,YearsOfExperience,Delays,Infractions
+
+DR001,Joy Dei,5,2,1
+DR002,Emmanuel Sakyi,3,1,0
+DR003,Paulina Boakyewaa,8,0,0
+DR004,Bismark Darfour,4,3,2
+DR005,Michael Budu-Biney,6,0,1
+DR006,Nana Oji,2,1,0
+DR007,Joel Takyi,10,0,0
+DR008,Felix Donkor,7,2,0
+DR009,Kris Amoateng,1,0,0
+DR010,Isaac Owusu,5,1,1
+DR011,Esi Boateng,3,0,1
+DR012,Kojo Antwi,6,0,0
+DR013,Dorcas Yeboah,4,1,2
+DR014,Amos Ofori,2,2,0
+DR015,Grace Amankwah,5,1,1
