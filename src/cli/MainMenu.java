@@ -1,10 +1,12 @@
 package cli;
 
+import modules.VehicleManager;
 import java.util.Scanner;
 
 public class MainMenu {
 
     private final Scanner scanner = new Scanner(System.in);
+    private final VehicleManager vehicleManager = new VehicleManager(); // Added vehicle manager
     private boolean running = true;
 
     public void launch() {
@@ -49,9 +51,30 @@ public class MainMenu {
     }
 
     private void manageVehicles() {
-        System.out.println("\n--- Vehicle Management Module ---");
-        // TODO: Call VehicleManager logic here
-        System.out.println("This will manage vehicles (add/search/remove).");
+        boolean inVehicleMenu = true;
+
+        while (inVehicleMenu) {
+            System.out.println("\n--- Vehicle Management ---");
+            System.out.println("1. Add Vehicle");
+            System.out.println("2. View All Vehicles");
+            System.out.println("3. Search Vehicle by Reg No");
+            System.out.println("4. View Vehicles Sorted by Mileage");
+            System.out.println("5. Search Vehicles by Mileage");
+            System.out.println("6. Back to Main Menu");
+            System.out.print("Enter your choice (1-6): ");
+
+            String input = scanner.nextLine().trim();
+
+            switch (input) {
+                case "1" -> vehicleManager.addVehicle();
+                case "2" -> vehicleManager.listVehicles();
+                case "3" -> vehicleManager.searchVehicle();
+                case "4" -> vehicleManager.listVehiclesSortedByMileage();
+                case "5" -> vehicleManager.searchByMileage(); 
+                case "6" -> inVehicleMenu = false;
+                default -> System.out.println("Invalid input. Please try again.");
+            }
+        }
     }
 
     private void manageDrivers() {
@@ -79,7 +102,7 @@ public class MainMenu {
     }
 
     private void exitSystem() {
-        System.out.println("\n✅ Exiting system. Thank you!");
+        System.out.println("\nExiting system. Thank you!");
         running = false;
     }
 }
