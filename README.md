@@ -19,10 +19,14 @@ Adom Logistics in Tema currently relies on manual processes for managing their f
 
 ### 2. 👷 Driver Management
 
-* **Functionality:** Manages a pool of available drivers, facilitates assignment based on criteria like proximity or experience, and tracks driver routes, delays, and infractions.
+* **Functionality:** Handles all operations related to drivers: adding, listing, searching, and assigning. Manages the order of available drivers for assignment and ensures fair assignment.
 * **Data Structures Used:**
-    * **`Queue`**: For FIFO (First-In, First-Out) assignment of available drivers.
-    * **`Stack`**: Potentially for LIFO (Last-In, First-Out) tracking of driver activities or historical assignments.
+    * **`HashMap`**: Stores all registered drivers as a key-value data structure.
+        * **Purpose:** Allows for quick search by driver ID (O(1) average case), efficient duplicate ID checks before adding a new driver, and easy access to all drivers for file saving operations.
+    * **`Queue`**: Manages the order of available drivers for assignment, ensuring a First-In-First-Out (FIFO) assignment approach.
+        * **Operations:** `enqueue(driver)` (add to back), `dequeue()` (remove from front for assignment), `peek()` (view the next driver without removing), `printAll()` (display available drivers).
+    * **`ArrayList`**: A resizable array-based list that maintains insertion order and allows indexed access.
+        * **Purpose:** Temporarily holds drivers when reading from or writing to `drivers.txt`, facilitating file I/O operations.
 
 ### 3. 📦 Delivery Tracking
 
