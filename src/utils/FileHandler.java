@@ -3,42 +3,40 @@ package utils;
 import models.Vehicle;
 import models.Driver;
 import models.Delivery;
+import models.Maintenance;
 
 import java.io.*;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 public class FileHandler {
 
     private static final String VEHICLE_FILE = "data/vehicles.txt";
     private static final String DRIVER_FILE = "data/drivers.txt";
     private static final String DELIVERY_FILE = "data/deliveries.txt";
+    private static final String MAINTENANCE_FILE = "data/maintenance.txt";
 
     // === VEHICLES ===
 
     public static void saveVehicles(List<Vehicle> vehicles) {
         try {
             ensureDataDirectory();
-
             try (BufferedWriter writer = new BufferedWriter(new FileWriter(VEHICLE_FILE))) {
                 for (Vehicle v : vehicles) {
                     writer.write(formatVehicle(v));
                     writer.newLine();
                 }
-                System.out.println("✅ Vehicles saved to " + VEHICLE_FILE);
+                System.out.println("Vehicles saved to " + VEHICLE_FILE);
             }
-
         } catch (IOException e) {
-            System.out.println("❌ Error saving vehicles: " + e.getMessage());
+            System.out.println("Error saving vehicles: " + e.getMessage());
         }
     }
 
     public static List<Vehicle> loadVehicles() {
         List<Vehicle> vehicles = new ArrayList<>();
         File file = new File(VEHICLE_FILE);
-
         if (!file.exists()) {
-            System.out.println("📂 No existing vehicle file found. Starting fresh.");
+            System.out.println("No existing vehicle file found. Starting fresh.");
             return vehicles;
         }
 
@@ -46,12 +44,10 @@ public class FileHandler {
             String line;
             while ((line = reader.readLine()) != null) {
                 Vehicle vehicle = parseVehicle(line);
-                if (vehicle != null) {
-                    vehicles.add(vehicle);
-                }
+                if (vehicle != null) vehicles.add(vehicle);
             }
         } catch (IOException e) {
-            System.out.println("❌ Error loading vehicles: " + e.getMessage());
+            System.out.println("Error loading vehicles: " + e.getMessage());
         }
 
         return vehicles;
@@ -89,26 +85,23 @@ public class FileHandler {
     public static void saveDrivers(List<Driver> drivers) {
         try {
             ensureDataDirectory();
-
             try (BufferedWriter writer = new BufferedWriter(new FileWriter(DRIVER_FILE))) {
                 for (Driver d : drivers) {
                     writer.write(formatDriver(d));
                     writer.newLine();
                 }
-                System.out.println("✅ Drivers saved to " + DRIVER_FILE);
+                System.out.println("Drivers saved to " + DRIVER_FILE);
             }
-
         } catch (IOException e) {
-            System.out.println("❌ Error saving drivers: " + e.getMessage());
+            System.out.println("Error saving drivers: " + e.getMessage());
         }
     }
 
     public static List<Driver> loadDrivers() {
         List<Driver> drivers = new ArrayList<>();
         File file = new File(DRIVER_FILE);
-
         if (!file.exists()) {
-            System.out.println("📂 No existing driver file found. Starting fresh.");
+            System.out.println("No existing driver file found. Starting fresh.");
             return drivers;
         }
 
@@ -116,12 +109,10 @@ public class FileHandler {
             String line;
             while ((line = reader.readLine()) != null) {
                 Driver driver = parseDriver(line);
-                if (driver != null) {
-                    drivers.add(driver);
-                }
+                if (driver != null) drivers.add(driver);
             }
         } catch (IOException e) {
-            System.out.println("❌ Error loading drivers: " + e.getMessage());
+            System.out.println("Error loading drivers: " + e.getMessage());
         }
 
         return drivers;
@@ -153,7 +144,6 @@ public class FileHandler {
             for (int i = 0; i < infractions; i++) d.addInfraction();
 
             return d;
-
         } catch (Exception e) {
             return null;
         }
@@ -164,26 +154,23 @@ public class FileHandler {
     public static void saveDeliveries(List<Delivery> deliveries) {
         try {
             ensureDataDirectory();
-
             try (BufferedWriter writer = new BufferedWriter(new FileWriter(DELIVERY_FILE))) {
                 for (Delivery d : deliveries) {
                     writer.write(formatDelivery(d));
                     writer.newLine();
                 }
-                System.out.println("✅ Deliveries saved to " + DELIVERY_FILE);
+                System.out.println("Deliveries saved to " + DELIVERY_FILE);
             }
-
         } catch (IOException e) {
-            System.out.println("❌ Error saving deliveries: " + e.getMessage());
+            System.out.println("Error saving deliveries: " + e.getMessage());
         }
     }
 
     public static List<Delivery> loadDeliveries() {
         List<Delivery> deliveries = new ArrayList<>();
         File file = new File(DELIVERY_FILE);
-
         if (!file.exists()) {
-            System.out.println("📂 No existing deliveries file found. Starting fresh.");
+            System.out.println("No existing deliveries file found. Starting fresh.");
             return deliveries;
         }
 
@@ -218,14 +205,95 @@ public class FileHandler {
 
         try {
             return new Delivery(
-                    parts[0], // packageId
-                    parts[1], // origin
-                    parts[2], // destination
-                    parts[3], // eta
-                    parts[4], // vehicle
-                    parts[5], // driver
-                    parts[6]  // status
+                    parts[0], parts[1], parts[2], parts[3],
+                    parts[4], parts[5], parts[6]
             );
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    // === MAINTENANCE (Flat List API) ===
+
+    public static void saveMaintenance(List<Maintenance> records) {
+        try {
+            ensureDataDirectory();
+            try (BufferedWriter writer = new BufferedWriter(new FileWriter(MAINTENANCE_FILE))) {
+                for (Maintenance m : records) {
+                    writer.write(formatMaintenance(m));
+                    writer.newLine();
+                }
+                System.out.println("Maintenance records saved to " + MAINTENANCE_FILE);
+            }
+        } catch (IOException e) {
+            System.out.println("Error saving maintenance: " + e.getMessage());
+        }
+    }
+
+    public static List<Maintenance> loadMaintenance() {
+        List<Maintenance> records = new ArrayList<>();
+        File file = new File(MAINTENANCE_FILE);
+
+        if (!file.exists()) {
+            System.out.println("No existing maintenance file found.");
+            return records;
+        }
+
+        try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                Maintenance m = parseMaintenance(line);
+                if (m != null) records.add(m);
+            }
+        } catch (IOException e) {
+            System.out.println("Error loading maintenance: " + e.getMessage());
+        }
+
+        return records;
+    }
+
+    // === MAINTENANCE (Nested Map API) ===
+
+    public static void saveMaintenanceRecords(Map<String, List<Maintenance>> map) {
+        List<Maintenance> all = new ArrayList<>();
+        for (List<Maintenance> list : map.values()) {
+            all.addAll(list);
+        }
+        saveMaintenance(all);
+    }
+
+    public static Map<String, List<Maintenance>> loadMaintenanceRecords() {
+        Map<String, List<Maintenance>> map = new HashMap<>();
+        for (Maintenance m : loadMaintenance()) {
+            map.computeIfAbsent(m.getVehicleRegNo(), k -> new ArrayList<>()).add(m);
+        }
+        return map;
+    }
+
+    // === MAINTENANCE Utility ===
+
+    private static String formatMaintenance(Maintenance m) {
+        return String.join(",",
+                m.getVehicleRegNo(),
+                m.getDate(),
+                m.getDescription(),
+                String.join("|", m.getPartsReplaced()),
+                String.valueOf(m.getCost())
+        );
+    }
+
+    private static Maintenance parseMaintenance(String line) {
+        String[] parts = line.split(",", -1);
+        if (parts.length != 5) return null;
+
+        try {
+            String regNo = parts[0];
+            String date = parts[1];
+            String desc = parts[2];
+            List<String> partsList = List.of(parts[3].split("\\|"));
+            double cost = Double.parseDouble(parts[4]);
+
+            return new Maintenance(regNo, date, desc, partsList, cost);
         } catch (Exception e) {
             return null;
         }

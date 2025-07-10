@@ -1,0 +1,7 @@
+<registrationNumber>,<date>,<description>,<partsReplaced>,<cost>
+
+TRK-1001,2025-06-15,Engine oil change,Oil filter|Engine oil,150.00
+VAN-2002,2025-06-20,Brake system check,Brake pads|Brake fluid,220.50
+TRK-3003,2025-07-01,Transmission repair,Gasket|Transmission fluid,400.00
+VAN-4004,2025-07-04,Air conditioning service,AC compressor|Coolant,320.75
+TRK-5005,2025-07-06,Tire rotation and alignment,Tires|Alignment bolts,180.00

@@ -3,6 +3,7 @@ package cli;
 import modules.VehicleManager;
 import modules.DriverManager;
 import modules.DeliveryManager;
+import modules.MaintenanceManager;
 
 import java.util.Scanner;
 
@@ -12,6 +13,7 @@ public class MainMenu {
     private final VehicleManager vehicleManager = new VehicleManager();
     private final DriverManager driverManager = new DriverManager();
     private final DeliveryManager deliveryManager = new DeliveryManager(driverManager, vehicleManager);
+    private final MaintenanceManager maintenanceManager = new MaintenanceManager(vehicleManager); // ✅ New
     private boolean running = true;
 
     public void launch() {
@@ -137,8 +139,26 @@ public class MainMenu {
     }
 
     private void scheduleMaintenance() {
-        System.out.println("\n--- Maintenance Scheduling Module ---");
-        System.out.println("This will schedule and log vehicle maintenance.");
+        boolean inMaintenanceMenu = true;
+
+        while (inMaintenanceMenu) {
+            System.out.println("\n--- Maintenance Scheduling ---");
+            System.out.println("1. Schedule Maintenance Now");
+            System.out.println("2. View Maintenance History for a Vehicle");
+            System.out.println("3. View Next Vehicle Due for Maintenance");
+            System.out.println("4. Back to Main Menu");
+            System.out.print("Enter your choice (1-4): ");
+
+            String input = scanner.nextLine().trim();
+
+            switch (input) {
+                case "1" -> maintenanceManager.scheduleMaintenance();           // 🔧 Trigger logic & prompt
+                case "2" -> maintenanceManager.viewMaintenanceHistory();       // 📋 Show nested Map
+                case "3" -> maintenanceManager.viewNextVehicleDue();           // ⏳ Show MinHeap top
+                case "4" -> inMaintenanceMenu = false;
+                default -> System.out.println("Invalid input. Try again.");
+            }
+        }
     }
 
     private void generateReports() {

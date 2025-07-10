@@ -110,4 +110,8 @@ public class VehicleManager {
         }
         return null; // no vehicle available
     }
+
+    public List<Vehicle> getAllVehicles() {
+    return vehicleTable.toList();
+}
 }
