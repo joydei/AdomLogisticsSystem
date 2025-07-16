@@ -4,11 +4,13 @@ import models.Vehicle;
 import structures.hash.HashTable;
 import structures.bst.BST;
 import utils.FileHandler;
+import utils.InputValidator;
 
 import java.util.List;
 import java.util.Scanner;
 
 public class VehicleManager {
+
     private final HashTable vehicleTable = new HashTable(); // for reg number
     private final BST vehicleTree = new BST();              // for mileage
     private final Scanner scanner = new Scanner(System.in);
@@ -29,36 +31,64 @@ public class VehicleManager {
     public void addVehicle() {
         System.out.println("\n--- Add New Vehicle ---");
 
-        System.out.print("Enter Registration Number: ");
-        String regNo = scanner.nextLine().trim();
+        while (true) {
+            // Get registration number
+            String regNo = InputValidator.getValidString("Enter Registration Number: ", 3, 20);
+            if (regNo.equals("BACK")) {
+                return;
+            }
 
-        if (vehicleTable.containsKey(regNo)) {
-            System.out.println("Vehicle with this registration number already exists!");
-            return;
+            if (vehicleTable.containsKey(regNo)) {
+                if (!InputValidator.handleErrorAndAskRetry("Vehicle with this registration number already exists!")) {
+                    return;
+                }
+                continue;
+            }
+
+            // Get vehicle type with validation
+            String[] allowedTypes = {"Truck", "Van"};
+            String type = InputValidator.getValidChoice("Enter Vehicle Type (Truck/Van): ", allowedTypes, false);
+            if (type.equals("BACK")) {
+                return;
+            }
+
+            // Get mileage with validation
+            int mileage = InputValidator.getValidInteger("Enter Mileage (km): ", 0, 1000000);
+            if (mileage == -999) {
+                return;
+            }
+
+            // Get fuel usage with validation
+            double fuelUsage = InputValidator.getValidDouble("Enter Fuel Usage (liters per 100km): ", 0.1, 100.0);
+            if (fuelUsage == -999.0) {
+                return;
+            }
+
+            // Get driver ID
+            String driverId = InputValidator.getValidString("Enter Driver ID: ", 2, 15);
+            if (driverId.equals("BACK")) {
+                return;
+            }
+
+            try {
+                Vehicle vehicle = new Vehicle(regNo, type, mileage, fuelUsage, driverId);
+
+                // Add to in-memory structures
+                vehicleTable.put(regNo, vehicle);
+                vehicleTree.insert(vehicle);
+
+                // Save updated list to file
+                FileHandler.saveVehicles(vehicleTable.toList());
+
+                InputValidator.showSuccess("Vehicle added and saved successfully!");
+                return;
+
+            } catch (Exception e) {
+                if (!InputValidator.handleErrorAndAskRetry("Error creating vehicle: " + e.getMessage())) {
+                    return;
+                }
+            }
         }
-
-        System.out.print("Enter Vehicle Type (Truck/Van): ");
-        String type = scanner.nextLine().trim();
-
-        System.out.print("Enter Mileage (km): ");
-        int mileage = Integer.parseInt(scanner.nextLine().trim());
-
-        System.out.print("Enter Fuel Usage (liters per 100km): ");
-        double fuelUsage = Double.parseDouble(scanner.nextLine().trim());
-
-        System.out.print("Enter Driver ID: ");
-        String driverId = scanner.nextLine().trim();
-
-        Vehicle vehicle = new Vehicle(regNo, type, mileage, fuelUsage, driverId);
-
-        // Add to in-memory structures
-        vehicleTable.put(regNo, vehicle);
-        vehicleTree.insert(vehicle);
-
-        // Save updated list to file
-        FileHandler.saveVehicles(vehicleTable.toList());
-
-        System.out.println("Vehicle added and saved successfully!");
     }
 
     // Display all vehicles (unsorted, via HashTable)
@@ -75,25 +105,39 @@ public class VehicleManager {
     // Search for a vehicle by registration number
     public void searchVehicle() {
         System.out.println("\n--- Search Vehicle by Reg No ---");
-        System.out.print("Enter Registration Number: ");
-        String regNo = scanner.nextLine().trim();
 
-        Vehicle found = vehicleTable.get(regNo);
-        if (found != null) {
-            System.out.println("Vehicle Found:");
-            System.out.println(found);
-        } else {
-            System.out.println("Vehicle not found.");
+        while (true) {
+            String regNo = InputValidator.getValidString("Enter Registration Number: ", 1, 20);
+            if (regNo.equals("BACK")) {
+                return;
+            }
+
+            Vehicle found = vehicleTable.get(regNo);
+            if (found != null) {
+                System.out.println("Vehicle Found:");
+                System.out.println(found);
+                return;
+            } else {
+                if (!InputValidator.handleErrorAndAskRetry("Vehicle not found.")) {
+                    return;
+                }
+            }
         }
     }
 
     // Search for vehicles by mileage (can have duplicates)
     public void searchByMileage() {
         System.out.println("\n--- Search Vehicles by Mileage ---");
-        System.out.print("Enter mileage to search: ");
-        int mileage = Integer.parseInt(scanner.nextLine().trim());
 
-        vehicleTree.searchByMileage(mileage);
+        while (true) {
+            int mileage = InputValidator.getValidInteger("Enter mileage to search: ", 0, 1000000);
+            if (mileage == -999) {
+                return;
+            }
+
+            vehicleTree.searchByMileage(mileage);
+            return;
+        }
     }
 
     // Optional: Expose vehicle lookup by regNo
@@ -112,6 +156,6 @@ public class VehicleManager {
     }
 
     public List<Vehicle> getAllVehicles() {
-    return vehicleTable.toList();
-}
+        return vehicleTable.toList();
+    }
 }
