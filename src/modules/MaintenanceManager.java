@@ -14,23 +14,41 @@ public class MaintenanceManager {
     private final Scanner scanner = new Scanner(System.in);
 
     public MaintenanceManager(VehicleManager vehicleManager) {
-        // Load vehicles and sort manually by mileage
+        // Load vehicles and sort manually by mileage using QuickSort
         List<Vehicle> allVehicles = vehicleManager.getAllVehicles();
         sortedVehicleList.addAll(allVehicles);
-        sortVehiclesByMileage();
+        quickSortVehiclesByMileage(0, sortedVehicleList.size() - 1);
         System.out.println("Loaded " + allMaintenanceRecords.size() + " maintenance records.");
     }
 
-    private void sortVehiclesByMileage() {
-        for (int i = 0; i < sortedVehicleList.size(); i++) {
-            for (int j = i + 1; j < sortedVehicleList.size(); j++) {
-                if (sortedVehicleList.get(j).getMileage() < sortedVehicleList.get(i).getMileage()) {
-                    Vehicle temp = sortedVehicleList.get(i);
-                    sortedVehicleList.set(i, sortedVehicleList.get(j));
-                    sortedVehicleList.set(j, temp);
-                }
+    // QuickSort implementation for vehicles by mileage ascending
+    private void quickSortVehiclesByMileage(int low, int high) {
+        if (low < high) {
+            int pivotIndex = partition(low, high);
+            quickSortVehiclesByMileage(low, pivotIndex - 1);
+            quickSortVehiclesByMileage(pivotIndex + 1, high);
+        }
+    }
+
+    private int partition(int low, int high) {
+        Vehicle pivot = sortedVehicleList.get(high);
+        int pivotMileage = pivot.getMileage();
+        int i = low - 1;
+
+        for (int j = low; j < high; j++) {
+            if (sortedVehicleList.get(j).getMileage() <= pivotMileage) {
+                i++;
+                swapVehicles(i, j);
             }
         }
+        swapVehicles(i + 1, high);
+        return i + 1;
+    }
+
+    private void swapVehicles(int i, int j) {
+        Vehicle temp = sortedVehicleList.get(i);
+        sortedVehicleList.set(i, sortedVehicleList.get(j));
+        sortedVehicleList.set(j, temp);
     }
 
     // === CORE LOGIC ===

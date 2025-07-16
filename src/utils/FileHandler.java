@@ -45,21 +45,33 @@ public class FileHandler {
             return vehicles;
         }
 
-        try {
-            BufferedReader reader = new BufferedReader(new FileReader(file));
+        try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
             String line;
+            boolean firstLine = true;
             while ((line = reader.readLine()) != null) {
+                // Skip header if present
+                if (firstLine && line.toLowerCase().contains("registration")) {
+                    firstLine = false;
+                    continue;
+                }
+                firstLine = false;
+
                 String[] parts = line.split(",");
                 if (parts.length == 5) {
-                    String reg = parts[0];
-                    String type = parts[1];
-                    int mileage = Integer.parseInt(parts[2]);
-                    double fuel = Double.parseDouble(parts[3]);
-                    String driverId = parts[4];
-                    vehicles.add(new Vehicle(reg, type, mileage, fuel, driverId));
+                    try {
+                        String reg = parts[0].trim();
+                        String type = parts[1].trim();
+                        int mileage = Integer.parseInt(parts[2].trim());
+                        double fuel = Double.parseDouble(parts[3].trim());
+                        String driverId = parts[4].trim();
+                        vehicles.add(new Vehicle(reg, type, mileage, fuel, driverId));
+                    } catch (NumberFormatException e) {
+                        System.out.println("Skipping invalid vehicle line (number format): " + line);
+                    }
+                } else {
+                    System.out.println("Skipping invalid vehicle line (wrong field count): " + line);
                 }
             }
-            reader.close();
         } catch (Exception e) {
             System.out.println("Error loading vehicles: " + e.getMessage());
         }
@@ -96,24 +108,35 @@ public class FileHandler {
             return drivers;
         }
 
-        try {
-            BufferedReader reader = new BufferedReader(new FileReader(file));
+        try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
             String line;
+            boolean firstLine = true;
             while ((line = reader.readLine()) != null) {
+                if (firstLine && line.toLowerCase().contains("driverid")) {
+                    firstLine = false;
+                    continue;
+                }
+                firstLine = false;
+
                 String[] parts = line.split(",");
                 if (parts.length == 5) {
-                    String id = parts[0];
-                    String name = parts[1];
-                    int exp = Integer.parseInt(parts[2]);
-                    int delays = Integer.parseInt(parts[3]);
-                    int infractions = Integer.parseInt(parts[4]);
-                    Driver d = new Driver(id, name, exp);
-                    for (int i = 0; i < delays; i++) d.addDelay();
-                    for (int i = 0; i < infractions; i++) d.addInfraction();
-                    drivers.add(d);
+                    try {
+                        String id = parts[0].trim();
+                        String name = parts[1].trim();
+                        int exp = Integer.parseInt(parts[2].trim());
+                        int delays = Integer.parseInt(parts[3].trim());
+                        int infractions = Integer.parseInt(parts[4].trim());
+                        Driver d = new Driver(id, name, exp);
+                        for (int i = 0; i < delays; i++) d.addDelay();
+                        for (int i = 0; i < infractions; i++) d.addInfraction();
+                        drivers.add(d);
+                    } catch (NumberFormatException e) {
+                        System.out.println("Skipping invalid driver line (number format): " + line);
+                    }
+                } else {
+                    System.out.println("Skipping invalid driver line (wrong field count): " + line);
                 }
             }
-            reader.close();
         } catch (Exception e) {
             System.out.println("Error loading drivers: " + e.getMessage());
         }
@@ -152,19 +175,26 @@ public class FileHandler {
             return deliveries;
         }
 
-        try {
-            BufferedReader reader = new BufferedReader(new FileReader(file));
+        try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
             String line;
+            boolean firstLine = true;
             while ((line = reader.readLine()) != null) {
+                if (firstLine && line.toLowerCase().contains("packageid")) {
+                    firstLine = false;
+                    continue;
+                }
+                firstLine = false;
+
                 String[] parts = line.split(",");
                 if (parts.length == 7) {
                     deliveries.add(new Delivery(
-                        parts[0], parts[1], parts[2], parts[3],
-                        parts[4], parts[5], parts[6]
+                        parts[0].trim(), parts[1].trim(), parts[2].trim(), parts[3].trim(),
+                        parts[4].trim(), parts[5].trim(), parts[6].trim()
                     ));
+                } else {
+                    System.out.println("Skipping invalid delivery line: " + line);
                 }
             }
-            reader.close();
         } catch (Exception e) {
             System.out.println("Error loading deliveries: " + e.getMessage());
         }
@@ -203,23 +233,34 @@ public class FileHandler {
             return records;
         }
 
-        try {
-            BufferedReader reader = new BufferedReader(new FileReader(file));
+        try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
             String line;
+            boolean firstLine = true;
             while ((line = reader.readLine()) != null) {
+                if (firstLine && line.toLowerCase().contains("registration")) {
+                    firstLine = false;
+                    continue;
+                }
+                firstLine = false;
+
                 String[] parts = line.split(",", -1);
                 if (parts.length == 7) {
-                    String reg = parts[0];
-                    String type = parts[1];
-                    String date = parts[2];
-                    int mileage = Integer.parseInt(parts[3]);
-                    String partsReplaced = parts[4];
-                    double cost = Double.parseDouble(parts[5]);
-                    String nextDate = parts[6];
-                    records.add(new Maintenance(reg, type, date, mileage, partsReplaced, cost, nextDate));
+                    try {
+                        String reg = parts[0].trim();
+                        String type = parts[1].trim();
+                        String date = parts[2].trim();
+                        int mileage = Integer.parseInt(parts[3].trim());
+                        String partsReplaced = parts[4].trim();
+                        double cost = Double.parseDouble(parts[5].trim());
+                        String nextDate = parts[6].trim();
+                        records.add(new Maintenance(reg, type, date, mileage, partsReplaced, cost, nextDate));
+                    } catch (NumberFormatException e) {
+                        System.out.println("Skipping invalid maintenance line (number format): " + line);
+                    }
+                } else {
+                    System.out.println("Skipping invalid maintenance line (wrong field count): " + line);
                 }
             }
-            reader.close();
         } catch (Exception e) {
             System.out.println("Error loading maintenance: " + e.getMessage());
         }

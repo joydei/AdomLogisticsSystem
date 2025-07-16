@@ -4,8 +4,9 @@ import modules.VehicleManager;
 import modules.DriverManager;
 import modules.DeliveryManager;
 import modules.MaintenanceManager;
+import models.Vehicle;
 
-import java.util.Scanner;
+import java.util.*;
 
 public class MainMenu {
 
@@ -13,7 +14,7 @@ public class MainMenu {
     private final VehicleManager vehicleManager = new VehicleManager();
     private final DriverManager driverManager = new DriverManager();
     private final DeliveryManager deliveryManager = new DeliveryManager(driverManager, vehicleManager);
-    private final MaintenanceManager maintenanceManager = new MaintenanceManager(vehicleManager); // Now flat-list based
+    private final MaintenanceManager maintenanceManager = new MaintenanceManager(vehicleManager);
     private boolean running = true;
 
     public void launch() {
@@ -32,7 +33,7 @@ public class MainMenu {
             }
 
             System.out.println("\nPress Enter to return to the menu...");
-            scanner.nextLine(); // Pause
+            scanner.nextLine();
         }
     }
 
@@ -48,13 +49,11 @@ public class MainMenu {
     }
 
     private int getUserChoice() {
-        int choice = -1;
         try {
-            choice = Integer.parseInt(scanner.nextLine().trim());
+            return Integer.parseInt(scanner.nextLine().trim());
         } catch (NumberFormatException e) {
-            // invalid input will be caught in the switch
+            return -1;
         }
-        return choice;
     }
 
     private void manageVehicles() {
@@ -164,8 +163,85 @@ public class MainMenu {
     }
 
     private void generateReports() {
-        System.out.println("\n--- Fuel Efficiency and System Reports ---");
-        System.out.println("This will generate reports on fuel and usage.");
+        System.out.println("\n--- Fuel Efficiency Report ---");
+
+        List<Vehicle> vehicles = vehicleManager.getAllVehicles();
+        if (vehicles.isEmpty()) {
+            System.out.println("No vehicles available to generate report.");
+            return;
+        }
+
+        // Sort using QuickSort
+        quickSort(vehicles, 0, vehicles.size() - 1);
+
+        // Calculate global average
+        double totalEfficiency = 0;
+        for (Vehicle v : vehicles) {
+            if (v.getMileage() > 0) {
+                totalEfficiency += v.getFuelUsage() / (double) v.getMileage();
+            }
+        }
+        double avgEfficiency = totalEfficiency / vehicles.size();
+
+        // Output sorted list with flags
+        System.out.printf("\nAverage Fuel Usage per km: %.5f liters/km\n", avgEfficiency);
+        System.out.println("\n--- Vehicles Sorted by Fuel Efficiency ---");
+
+        for (Vehicle v : vehicles) {
+            double eff = v.getMileage() == 0 ? 0 : v.getFuelUsage() / (double) v.getMileage();
+            System.out.printf("• %s | Type: %s | %.5f L/km", v.getRegistrationNumber(), v.getType(), eff);
+            if (eff > avgEfficiency * 1.2) System.out.print(" ⚠️ Inefficient");
+            if (eff < avgEfficiency * 0.8) System.out.print(" ✅ Efficient");
+            System.out.println();
+        }
+
+        // Breakdown by vehicle type
+        System.out.println("\n--- Efficiency Comparison by Vehicle Type ---");
+        Map<String, List<Vehicle>> typeMap = new HashMap<>();
+
+        for (Vehicle v : vehicles) {
+            typeMap.computeIfAbsent(v.getType().toLowerCase(), k -> new ArrayList<>()).add(v);
+        }
+
+        for (Map.Entry<String, List<Vehicle>> entry : typeMap.entrySet()) {
+            String type = entry.getKey();
+            List<Vehicle> group = entry.getValue();
+
+            double groupTotal = 0;
+            for (Vehicle v : group) {
+                if (v.getMileage() > 0) {
+                    groupTotal += v.getFuelUsage() / (double) v.getMileage();
+                }
+            }
+            double avg = groupTotal / group.size();
+            System.out.printf("• %-10s → Average Efficiency: %.5f L/km\n", type, avg);
+        }
+    }
+
+    private void quickSort(List<Vehicle> list, int low, int high) {
+        if (low < high) {
+            int pi = partition(list, low, high);
+            quickSort(list, low, pi - 1);
+            quickSort(list, pi + 1, high);
+        }
+    }
+
+    private int partition(List<Vehicle> list, int low, int high) {
+        double pivot = getEfficiency(list.get(high));
+        int i = low - 1;
+
+        for (int j = low; j < high; j++) {
+            if (getEfficiency(list.get(j)) < pivot) {
+                i++;
+                Collections.swap(list, i, j);
+            }
+        }
+        Collections.swap(list, i + 1, high);
+        return i + 1;
+    }
+
+    private double getEfficiency(Vehicle v) {
+        return v.getMileage() == 0 ? Double.MAX_VALUE : v.getFuelUsage() / (double) v.getMileage();
     }
 
     private void exitSystem() {

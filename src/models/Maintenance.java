@@ -83,7 +83,7 @@ public class Maintenance {
     @Override
     public String toString() {
         return String.format(
-            "📄 Vehicle: %s\n🔧 Service: %s\n📅 Date: %s\n📍 Mileage: %dkm\n🧩 Parts: %s\n💰 Cost: GHS %.2f\n📆 Next Service: %s\n",
+            "Vehicle: %s\nService: %s\nDate: %s\nMileage: %dkm\nParts: %s\nCost: GHS %.2f\nNext Service: %s\n",
             regNo, serviceType, serviceDate, mileageAtService, partsReplaced, cost,
             (nextServiceDate == null || nextServiceDate.isEmpty()) ? "N/A" : nextServiceDate
         );
