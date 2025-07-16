@@ -38,8 +38,9 @@ Adom Logistics in Tema currently relies on manual processes for managing their f
 
 * **Functionality:** Flags vehicles needing service based on mileage or service dates. Tracks detailed records of parts replaced and associated costs.
 * **Data Structures Used:**
-    * **`MinHeap`**: For priority scheduling of vehicle maintenance.
-    * **`Map (nested)`**: To store comprehensive maintenance history per vehicle.
+    * **`ArrayList<Maintenance>`**: Stores all maintenance records for all vehicles. Used for filtering history, appending new records, and saving to file.
+    * **`ArrayList<Vehicle>`**: Represents a queue of vehicles sorted by mileage. Used as a manual priority queue to determine which vehicle is due next.
+    * **`Bubble Sort`**: Bubble Sort is used to sort the vehicle list by mileage (ascending), mimicking a MinHeap behavior.
 
 ### 5. 📊 Fuel Efficiency Reports
 
