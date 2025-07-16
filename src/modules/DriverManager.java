@@ -21,9 +21,8 @@ public class DriverManager {
         if (!loaded.isEmpty()) {
             System.out.println("Loaded " + loaded.size() + " drivers from file.");
         }
-    }
+    }    // Add a new driver
 
-    // Add a new driver
     public void addDriver() {
         System.out.println("\n--- Add New Driver ---");
 
@@ -41,15 +40,27 @@ public class DriverManager {
                 continue;
             }
 
-            // Get driver name
-            String name = InputValidator.getValidString("Enter Name: ", 2, 50);
+            // Get driver name with proper validation
+            String name = InputValidator.getValidName("Enter Driver Name: ", 2, 50);
             if (name.equals("BACK")) {
                 return;
             }
 
             // Get years of experience
-            int exp = InputValidator.getValidInteger("Enter Years of Experience: ", 0, 50);
+            int exp = InputValidator.getValidInteger("Enter Years of Experience (0-50): ", 0, 50);
             if (exp == -999) {
+                return;
+            }
+
+            // Get license number with proper validation
+            String licenseNumber = InputValidator.getValidLicenseNumber("Enter License Number (e.g., ABC-123-DEF): ", 6, 20);
+            if (licenseNumber.equals("BACK")) {
+                return;
+            }
+
+            // Get phone number with proper validation
+            String phoneNumber = InputValidator.getValidPhoneNumber("Enter Phone Number (e.g., +1-234-567-8900): ");
+            if (phoneNumber.equals("BACK")) {
                 return;
             }
 
@@ -59,7 +70,6 @@ public class DriverManager {
                 availableDrivers.enqueue(driver);
 
                 FileHandler.saveDrivers(getAllDrivers());
-
                 InputValidator.showSuccess("Driver added successfully!");
                 return;
 
