@@ -33,7 +33,7 @@ public class VehicleManager {
         String regNo = scanner.nextLine().trim();
 
         if (vehicleTable.containsKey(regNo)) {
-            System.out.println("❌ Vehicle with this registration number already exists!");
+            System.out.println("Vehicle with this registration number already exists!");
             return;
         }
 

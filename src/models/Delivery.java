@@ -36,7 +36,7 @@ public class Delivery {
 
     @Override
     public String toString() {
-        return "📦 Package ID: " + packageId +
+        return "Package ID: " + packageId +
                 "\nOrigin: " + origin +
                 "\nDestination: " + destination +
                 "\nETA: " + eta +

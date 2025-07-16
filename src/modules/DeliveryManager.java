@@ -23,7 +23,7 @@ public class DeliveryManager {
         }
 
         if (!loaded.isEmpty()) {
-            System.out.println("📦 Loaded " + loaded.size() + " deliveries from file.");
+            System.out.println("Loaded " + loaded.size() + " deliveries from file.");
         }
     }
 
@@ -78,7 +78,7 @@ public class DeliveryManager {
 
         var delivery = deliveryQueue.find(d -> d.getPackageId().equalsIgnoreCase(packageId));
         if (delivery == null) {
-            System.out.println("❌ Delivery not found.");
+            System.out.println("Delivery not found.");
             return;
         }
 

@@ -190,8 +190,8 @@ public class MainMenu {
         for (Vehicle v : vehicles) {
             double eff = v.getMileage() == 0 ? 0 : v.getFuelUsage() / (double) v.getMileage();
             System.out.printf("• %s | Type: %s | %.5f L/km", v.getRegistrationNumber(), v.getType(), eff);
-            if (eff > avgEfficiency * 1.2) System.out.print(" ⚠️ Inefficient");
-            if (eff < avgEfficiency * 0.8) System.out.print(" ✅ Efficient");
+            if (eff > avgEfficiency * 1.2) System.out.print(" Inefficient");
+            if (eff < avgEfficiency * 0.8) System.out.print(" Efficient");
             System.out.println();
         }
 
