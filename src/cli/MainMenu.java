@@ -20,7 +20,7 @@ public class MainMenu {
     public void launch() {
         while (running) {
             showMainMenu();
-            int choice = getUserChoice();
+            int choice = getUserChoice(1, 6);
 
             switch (choice) {
                 case 1 -> manageVehicles();
@@ -29,7 +29,6 @@ public class MainMenu {
                 case 4 -> scheduleMaintenance();
                 case 5 -> generateReports();
                 case 6 -> exitSystem();
-                default -> System.out.println("Invalid choice. Please select a valid option.");
             }
 
             System.out.println("\nPress Enter to return to the menu...");
@@ -48,10 +47,16 @@ public class MainMenu {
         System.out.print("Enter your choice (1-6): ");
     }
 
-    private int getUserChoice() {
+    private int getUserChoice(int min, int max) {
         try {
-            return Integer.parseInt(scanner.nextLine().trim());
+            int choice = Integer.parseInt(scanner.nextLine().trim());
+            if (choice < min || choice > max) {
+                System.out.println("Please enter a valid option between " + min + " and " + max);
+                return -1;
+            }
+            return choice;
         } catch (NumberFormatException e) {
+            System.out.println("Invalid input. Please enter a number.");
             return -1;
         }
     }
@@ -69,9 +74,7 @@ public class MainMenu {
             System.out.println("6. Back to Main Menu");
             System.out.print("Enter your choice (1-6): ");
 
-            String input = scanner.nextLine().trim();
-
-            switch (input) {
+            switch (scanner.nextLine().trim()) {
                 case "1" -> vehicleManager.addVehicle();
                 case "2" -> vehicleManager.listVehicles();
                 case "3" -> vehicleManager.searchVehicle();
@@ -96,9 +99,7 @@ public class MainMenu {
             System.out.println("6. Back to Main Menu");
             System.out.print("Enter your choice (1-6): ");
 
-            String input = scanner.nextLine().trim();
-
-            switch (input) {
+            switch (scanner.nextLine().trim()) {
                 case "1" -> driverManager.addDriver();
                 case "2" -> driverManager.listDrivers();
                 case "3" -> driverManager.searchDriverById();
@@ -123,9 +124,7 @@ public class MainMenu {
             System.out.println("6. Back to Main Menu");
             System.out.print("Enter your choice (1-6): ");
 
-            String input = scanner.nextLine().trim();
-
-            switch (input) {
+            switch (scanner.nextLine().trim()) {
                 case "1" -> deliveryManager.addDelivery();
                 case "2" -> deliveryManager.listDeliveries();
                 case "3" -> deliveryManager.searchByPackageId();
@@ -149,9 +148,7 @@ public class MainMenu {
             System.out.println("5. Back to Main Menu");
             System.out.print("Enter your choice (1-5): ");
 
-            String input = scanner.nextLine().trim();
-
-            switch (input) {
+            switch (scanner.nextLine().trim()) {
                 case "1" -> maintenanceManager.scheduleMaintenance();
                 case "2" -> maintenanceManager.viewMaintenanceHistory();
                 case "3" -> maintenanceManager.viewNextVehicleDue();
@@ -171,19 +168,25 @@ public class MainMenu {
             return;
         }
 
-        // Sort using QuickSort
         quickSort(vehicles, 0, vehicles.size() - 1);
 
-        // Calculate global average
         double totalEfficiency = 0;
+        int validVehicles = 0;
+
         for (Vehicle v : vehicles) {
             if (v.getMileage() > 0) {
                 totalEfficiency += v.getFuelUsage() / (double) v.getMileage();
+                validVehicles++;
             }
         }
-        double avgEfficiency = totalEfficiency / vehicles.size();
 
-        // Output sorted list with flags
+        if (validVehicles == 0) {
+            System.out.println("No valid vehicle data for fuel efficiency analysis.");
+            return;
+        }
+
+        double avgEfficiency = totalEfficiency / validVehicles;
+
         System.out.printf("\nAverage Fuel Usage per km: %.5f liters/km\n", avgEfficiency);
         System.out.println("\n--- Vehicles Sorted by Fuel Efficiency ---");
 
@@ -195,7 +198,6 @@ public class MainMenu {
             System.out.println();
         }
 
-        // Breakdown by vehicle type
         System.out.println("\n--- Efficiency Comparison by Vehicle Type ---");
         Map<String, List<Vehicle>> typeMap = new HashMap<>();
 
@@ -208,12 +210,18 @@ public class MainMenu {
             List<Vehicle> group = entry.getValue();
 
             double groupTotal = 0;
+            int count = 0;
+
             for (Vehicle v : group) {
                 if (v.getMileage() > 0) {
                     groupTotal += v.getFuelUsage() / (double) v.getMileage();
+                    count++;
                 }
             }
-            double avg = groupTotal / group.size();
+
+            if (count == 0) continue;
+
+            double avg = groupTotal / count;
             System.out.printf("• %-10s → Average Efficiency: %.5f L/km\n", type, avg);
         }
     }
@@ -236,6 +244,7 @@ public class MainMenu {
                 Collections.swap(list, i, j);
             }
         }
+
         Collections.swap(list, i + 1, high);
         return i + 1;
     }
