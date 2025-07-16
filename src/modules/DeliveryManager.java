@@ -1,11 +1,10 @@
 package modules;
 
+import java.util.Scanner;
 import models.Delivery;
 import structures.list.LinkedList;
 import utils.FileHandler;
 import utils.InputValidator;
-
-import java.util.Scanner;
 
 public class DeliveryManager {
 
@@ -47,20 +46,28 @@ public class DeliveryManager {
                 continue;
             }
 
-            // Get origin
-            String origin = InputValidator.getValidString("Enter Origin: ", 2, 50);
+            // Get origin with location validation
+            String origin = InputValidator.getValidLocation("Enter Origin: ", 2, 50);
             if (origin.equals("BACK")) {
                 return;
             }
 
-            // Get destination
-            String destination = InputValidator.getValidString("Enter Destination: ", 2, 50);
+            // Get destination with location validation  
+            String destination = InputValidator.getValidLocation("Enter Destination: ", 2, 50);
             if (destination.equals("BACK")) {
                 return;
             }
 
-            // Get ETA with proper date validation
-            String eta = InputValidator.getValidDateTime("Enter ETA");
+            // Validate that origin and destination are different
+            if (origin.equalsIgnoreCase(destination)) {
+                if (!InputValidator.handleErrorAndAskRetry("Origin and destination cannot be the same!")) {
+                    return;
+                }
+                continue;
+            }
+
+            // Get ETA with proper future date validation
+            String eta = InputValidator.getValidFutureDateTime("Enter ETA");
             if (eta.equals("BACK")) {
                 return;
             }
@@ -161,15 +168,35 @@ public class DeliveryManager {
                 continue;
             }
 
-            String newDest = InputValidator.getValidString("Enter new destination: ", 2, 50);
+            // Show current destination
+            System.out.println("Current destination: " + delivery.getDestination());
+            String currentDestination = delivery.getDestination(); // Store current destination
+
+            String newDest = InputValidator.getValidLocation("Enter new destination: ", 2, 50);
             if (newDest.equals("BACK")) {
                 return;
+            }
+
+            // Validate that new destination is different from current
+            if (newDest.equalsIgnoreCase(delivery.getDestination())) {
+                if (!InputValidator.handleErrorAndAskRetry("New destination must be different from current destination!")) {
+                    return;
+                }
+                continue;
+            }
+
+            // Validate that new destination is different from origin
+            if (newDest.equalsIgnoreCase(delivery.getOrigin())) {
+                if (!InputValidator.handleErrorAndAskRetry("Destination cannot be the same as origin!")) {
+                    return;
+                }
+                continue;
             }
 
             try {
                 delivery.setDestination(newDest);
                 FileHandler.saveDeliveries(deliveryQueue.toList());
-                InputValidator.showSuccess("Delivery rerouted.");
+                InputValidator.showSuccess("Delivery rerouted from '" + currentDestination + "' to '" + newDest + "'");
                 return;
             } catch (Exception e) {
                 if (!InputValidator.handleErrorAndAskRetry("Error rerouting delivery: " + e.getMessage())) {
@@ -212,6 +239,113 @@ public class DeliveryManager {
                     return;
                 }
             }
+        }
+    }
+
+    /**
+     * View all active deliveries (excludes cancelled deliveries by default)
+     */
+    public void viewActiveDeliveries() {
+        System.out.println("\n--- Active Deliveries ---");
+
+        boolean foundActive = false;
+        for (var delivery : deliveryQueue.toList()) {
+            if (!delivery.getStatus().equalsIgnoreCase("Cancelled")) {
+                System.out.println(delivery);
+                System.out.println("----------------------------------------");
+                foundActive = true;
+            }
+        }
+
+        if (!foundActive) {
+            System.out.println("No active deliveries found.");
+        }
+    }
+
+    /**
+     * View all deliveries including cancelled ones
+     */
+    public void viewAllDeliveries() {
+        System.out.println("\n--- All Deliveries (Including Cancelled) ---");
+
+        if (deliveryQueue.toList().isEmpty()) {
+            System.out.println("No deliveries found.");
+            return;
+        }
+
+        int active = 0, cancelled = 0;
+        for (var delivery : deliveryQueue.toList()) {
+            System.out.println(delivery);
+            System.out.println("----------------------------------------");
+
+            if (delivery.getStatus().equalsIgnoreCase("Cancelled")) {
+                cancelled++;
+            } else {
+                active++;
+            }
+        }
+
+        System.out.println("\nSummary: " + active + " active deliveries, " + cancelled + " cancelled deliveries");
+    }
+
+    /**
+     * View deliveries with filter options
+     */
+    public void viewDeliveriesMenu() {
+        while (true) {
+            System.out.println("\n--- View Deliveries ---");
+            System.out.println("1. View Active Deliveries (recommended)");
+            System.out.println("2. View All Deliveries (including cancelled)");
+            System.out.println("3. View by Status");
+
+            int choice = InputValidator.getValidMenuChoice("Enter choice (1-3): ", 1, 3);
+            if (choice == -1) {
+                return;
+            }
+
+            switch (choice) {
+                case 1:
+                    viewActiveDeliveries();
+                    return;
+                case 2:
+                    viewAllDeliveries();
+                    return;
+                case 3:
+                    viewDeliveriesByStatus();
+                    return;
+            }
+        }
+    }
+
+    /**
+     * View deliveries filtered by status
+     */
+    public void viewDeliveriesByStatus() {
+        String[] statuses = {"Pending", "In Transit", "Delivered", "Cancelled"};
+        System.out.println("\nSelect status to filter:");
+        for (int i = 0; i < statuses.length; i++) {
+            System.out.println((i + 1) + ". " + statuses[i]);
+        }
+
+        int choice = InputValidator.getValidMenuChoice("Enter choice (1-" + statuses.length + "): ", 1, statuses.length);
+        if (choice == -1) {
+            return;
+        }
+
+        String selectedStatus = statuses[choice - 1];
+        System.out.println("\n--- Deliveries with Status: " + selectedStatus + " ---");
+
+        boolean found = false;
+        for (var delivery : deliveryQueue.toList()) {
+            if (delivery.getStatus().equalsIgnoreCase(selectedStatus)) {
+                System.out.println(delivery);
+                System.out.println("----------------------------------------");
+                found = true;
+            }
+        }
+
+        if (!found) {
+            System.out.println("No deliveries found with status: " + selectedStatus);
         }
     }
 }
