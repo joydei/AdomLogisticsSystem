@@ -1,17 +1,15 @@
 package modules;
 
+import java.util.*;
 import models.Driver;
+import structures.queue.Queue;
 import utils.FileHandler;
 import utils.InputValidator;
-import structures.queue.Queue;
-
-import java.util.*;
 
 public class DriverManager {
 
     private final Queue<Driver> availableDrivers = new Queue<>();
     private final Map<String, Driver> driverMap = new HashMap<>();
-    private final Scanner scanner = new Scanner(System.in);
 
     public DriverManager() {
         List<Driver> loaded = FileHandler.loadDrivers();
