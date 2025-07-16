@@ -198,11 +198,7 @@ public class InputValidator {
             System.out.print("Continue? (y/yes to continue, any other key to go back): ");
             String input = scanner.nextLine().trim().toLowerCase();
 
-            if (input.equals("y") || input.equals("yes")) {
-                return true;
-            } else {
-                return false;
-            }
+            return input.equals("y") || input.equals("yes");
         }
     }
 
