@@ -2,39 +2,46 @@ package modules;
 
 import models.Maintenance;
 import models.Vehicle;
-import structures.heap.MinHeap;
 import utils.FileHandler;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Scanner;
 
 public class MaintenanceManager {
-    private final Map<String, List<Maintenance>> maintenanceHistory = new HashMap<>();
-    private final MinHeap<Vehicle> maintenanceQueue = new MinHeap<>((v1, v2) -> v1.getMileage() - v2.getMileage());
+    private final List<Maintenance> allMaintenanceRecords = FileHandler.loadMaintenance(); // flat list
+    private final List<Vehicle> sortedVehicleList = new ArrayList<>();
     private final Scanner scanner = new Scanner(System.in);
 
     public MaintenanceManager(VehicleManager vehicleManager) {
-        // Load history
-        Map<String, List<Maintenance>> loaded = FileHandler.loadMaintenanceRecords();
-        if (loaded != null) {
-            maintenanceHistory.putAll(loaded);
-            System.out.println("📂 Loaded maintenance history for " + loaded.size() + " vehicles.");
-        }
+        // Load vehicles and sort manually by mileage
+        List<Vehicle> allVehicles = vehicleManager.getAllVehicles();
+        sortedVehicleList.addAll(allVehicles);
+        sortVehiclesByMileage();
+        System.out.println("Loaded " + allMaintenanceRecords.size() + " maintenance records.");
+    }
 
-        // Populate priority queue
-        for (Vehicle v : vehicleManager.getAllVehicles()) {
-            maintenanceQueue.add(v);
+    private void sortVehiclesByMileage() {
+        for (int i = 0; i < sortedVehicleList.size(); i++) {
+            for (int j = i + 1; j < sortedVehicleList.size(); j++) {
+                if (sortedVehicleList.get(j).getMileage() < sortedVehicleList.get(i).getMileage()) {
+                    Vehicle temp = sortedVehicleList.get(i);
+                    sortedVehicleList.set(i, sortedVehicleList.get(j));
+                    sortedVehicleList.set(j, temp);
+                }
+            }
         }
     }
 
     // === CORE LOGIC ===
 
     public void scheduleNextMaintenance() {
-        if (maintenanceQueue.isEmpty()) {
+        if (sortedVehicleList.isEmpty()) {
             System.out.println("No vehicles currently need maintenance.");
             return;
         }
 
-        Vehicle next = maintenanceQueue.poll();
+        Vehicle next = sortedVehicleList.remove(0); // simulate priority
         System.out.println("\nVehicle Due for Maintenance:");
         System.out.println(next);
 
@@ -59,11 +66,8 @@ public class MaintenanceManager {
                 parts, cost, nextServiceDate
         );
 
-        maintenanceHistory
-                .computeIfAbsent(next.getRegistrationNumber(), k -> new ArrayList<>())
-                .add(m);
-
-        FileHandler.saveMaintenanceRecords(maintenanceHistory);
+        allMaintenanceRecords.add(m);
+        FileHandler.saveMaintenance(allMaintenanceRecords);
         System.out.println("Maintenance logged successfully.");
     }
 
@@ -71,21 +75,25 @@ public class MaintenanceManager {
         System.out.print("Enter Vehicle Reg No: ");
         String regNo = scanner.nextLine().trim();
 
-        List<Maintenance> history = maintenanceHistory.get(regNo);
-        if (history == null || history.isEmpty()) {
-            System.out.println("No maintenance records found for this vehicle.");
-            return;
+        boolean found = false;
+        System.out.println("\n--- Maintenance History for " + regNo + " ---");
+        for (Maintenance m : allMaintenanceRecords) {
+            if (m.getRegNo().equalsIgnoreCase(regNo)) {
+                System.out.println(m);
+                found = true;
+            }
         }
 
-        System.out.println("\n--- Maintenance History for " + regNo + " ---");
-        for (Maintenance m : history) {
-            System.out.println(m);
+        if (!found) {
+            System.out.println("No maintenance records found for this vehicle.");
         }
     }
 
     public void showMaintenanceQueue() {
         System.out.println("\n--- Maintenance Priority Queue (by mileage) ---");
-        maintenanceQueue.printAll();
+        for (Vehicle v : sortedVehicleList) {
+            System.out.printf("• RegNo: %s | Mileage: %d km\n", v.getRegistrationNumber(), v.getMileage());
+        }
     }
 
     // === ALIASES FOR MainMenu.java compatibility ===
@@ -99,10 +107,10 @@ public class MaintenanceManager {
     }
 
     public void viewNextVehicleDue() {
-        if (maintenanceQueue.isEmpty()) {
+        if (sortedVehicleList.isEmpty()) {
             System.out.println("No vehicles currently due for maintenance.");
         } else {
-            Vehicle next = maintenanceQueue.peek();
+            Vehicle next = sortedVehicleList.get(0);
             System.out.println("\nNext Vehicle Due for Maintenance:");
             System.out.printf("• RegNo: %s | Mileage: %d km\n", next.getRegistrationNumber(), next.getMileage());
         }

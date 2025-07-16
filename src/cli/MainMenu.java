@@ -13,7 +13,7 @@ public class MainMenu {
     private final VehicleManager vehicleManager = new VehicleManager();
     private final DriverManager driverManager = new DriverManager();
     private final DeliveryManager deliveryManager = new DeliveryManager(driverManager, vehicleManager);
-    private final MaintenanceManager maintenanceManager = new MaintenanceManager(vehicleManager); // ✅ New
+    private final MaintenanceManager maintenanceManager = new MaintenanceManager(vehicleManager); // Now flat-list based
     private boolean running = true;
 
     public void launch() {
@@ -52,7 +52,7 @@ public class MainMenu {
         try {
             choice = Integer.parseInt(scanner.nextLine().trim());
         } catch (NumberFormatException e) {
-            // handled in switch-case
+            // invalid input will be caught in the switch
         }
         return choice;
     }
@@ -146,16 +146,18 @@ public class MainMenu {
             System.out.println("1. Schedule Maintenance Now");
             System.out.println("2. View Maintenance History for a Vehicle");
             System.out.println("3. View Next Vehicle Due for Maintenance");
-            System.out.println("4. Back to Main Menu");
-            System.out.print("Enter your choice (1-4): ");
+            System.out.println("4. View Maintenance Queue");
+            System.out.println("5. Back to Main Menu");
+            System.out.print("Enter your choice (1-5): ");
 
             String input = scanner.nextLine().trim();
 
             switch (input) {
-                case "1" -> maintenanceManager.scheduleMaintenance();           // 🔧 Trigger logic & prompt
-                case "2" -> maintenanceManager.viewMaintenanceHistory();       // 📋 Show nested Map
-                case "3" -> maintenanceManager.viewNextVehicleDue();           // ⏳ Show MinHeap top
-                case "4" -> inMaintenanceMenu = false;
+                case "1" -> maintenanceManager.scheduleMaintenance();
+                case "2" -> maintenanceManager.viewMaintenanceHistory();
+                case "3" -> maintenanceManager.viewNextVehicleDue();
+                case "4" -> maintenanceManager.showMaintenanceQueue();
+                case "5" -> inMaintenanceMenu = false;
                 default -> System.out.println("Invalid input. Try again.");
             }
         }
