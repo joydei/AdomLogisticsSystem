@@ -3,12 +3,14 @@ package modules;
 import models.Maintenance;
 import models.Vehicle;
 import utils.FileHandler;
+import utils.InputValidator;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
 public class MaintenanceManager {
+
     private final List<Maintenance> allMaintenanceRecords = FileHandler.loadMaintenance(); // flat list
     private final List<Vehicle> sortedVehicleList = new ArrayList<>();
     private final Scanner scanner = new Scanner(System.in);
@@ -52,7 +54,6 @@ public class MaintenanceManager {
     }
 
     // === CORE LOGIC ===
-
     public void scheduleNextMaintenance() {
         if (sortedVehicleList.isEmpty()) {
             System.out.println("No vehicles currently need maintenance.");
@@ -90,20 +91,30 @@ public class MaintenanceManager {
     }
 
     public void viewHistory() {
-        System.out.print("Enter Vehicle Reg No: ");
-        String regNo = scanner.nextLine().trim();
+        System.out.println("\n--- View Maintenance History ---");
 
-        boolean found = false;
-        System.out.println("\n--- Maintenance History for " + regNo + " ---");
-        for (Maintenance m : allMaintenanceRecords) {
-            if (m.getRegNo().equalsIgnoreCase(regNo)) {
-                System.out.println(m);
-                found = true;
+        while (true) {
+            String regNo = InputValidator.getValidString("Enter Vehicle Reg No: ", 1, 20);
+            if (regNo.equals("BACK")) {
+                return;
             }
-        }
 
-        if (!found) {
-            System.out.println("No maintenance records found for this vehicle.");
+            boolean found = false;
+            System.out.println("\n--- Maintenance History for " + regNo + " ---");
+            for (Maintenance m : allMaintenanceRecords) {
+                if (m.getRegNo().equalsIgnoreCase(regNo)) {
+                    System.out.println(m);
+                    found = true;
+                }
+            }
+
+            if (!found) {
+                if (!InputValidator.handleErrorAndAskRetry("No maintenance records found for this vehicle.")) {
+                    return;
+                }
+            } else {
+                return;
+            }
         }
     }
 
@@ -115,7 +126,6 @@ public class MaintenanceManager {
     }
 
     // === ALIASES FOR MainMenu.java compatibility ===
-
     public void scheduleMaintenance() {
         scheduleNextMaintenance();
     }
