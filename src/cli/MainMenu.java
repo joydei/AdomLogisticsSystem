@@ -1,13 +1,12 @@
 package cli;
 
-import modules.VehicleManager;
-import modules.DriverManager;
-import modules.DeliveryManager;
-import modules.MaintenanceManager;
-import models.Vehicle;
-import utils.InputValidator;
-
 import java.util.*;
+import models.Vehicle;
+import modules.DeliveryManager;
+import modules.DriverManager;
+import modules.MaintenanceManager;
+import modules.VehicleManager;
+import utils.InputValidator;
 
 public class MainMenu {
 
@@ -65,20 +64,6 @@ public class MainMenu {
         System.out.println("5. Generate Reports");
         System.out.println("6. Exit");
         System.out.print("Enter your choice (1-6): ");
-    }
-
-    private int getUserChoice(int min, int max) {
-        try {
-            int choice = Integer.parseInt(scanner.nextLine().trim());
-            if (choice < min || choice > max) {
-                System.out.println("Please enter a valid option between " + min + " and " + max);
-                return -1;
-            }
-            return choice;
-        } catch (NumberFormatException e) {
-            System.out.println("Invalid input. Please enter a number.");
-            return -1;
-        }
     }
 
     private void manageVehicles() {
