@@ -1,19 +1,16 @@
 package modules;
 
+import java.util.List;
 import models.Vehicle;
-import structures.hash.HashTable;
 import structures.bst.BST;
+import structures.hash.HashTable;
 import utils.FileHandler;
 import utils.InputValidator;
-
-import java.util.List;
-import java.util.Scanner;
 
 public class VehicleManager {
 
     private final HashTable vehicleTable = new HashTable(); // for reg number
     private final BST vehicleTree = new BST();              // for mileage
-    private final Scanner scanner = new Scanner(System.in);
 
     public VehicleManager() {
         // Load vehicles from file on initialization
