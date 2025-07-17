@@ -3,12 +3,16 @@ package modules;
 import models.Maintenance;
 import models.Vehicle;
 import utils.FileHandler;
+import utils.InputValidator;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
 public class MaintenanceManager {
+
     private final List<Maintenance> allMaintenanceRecords = FileHandler.loadMaintenance(); // flat list
     private final List<Vehicle> sortedVehicleList = new ArrayList<>();
     private final Scanner scanner = new Scanner(System.in);
@@ -52,7 +56,6 @@ public class MaintenanceManager {
     }
 
     // === CORE LOGIC ===
-
     public void scheduleNextMaintenance() {
         if (sortedVehicleList.isEmpty()) {
             System.out.println("No vehicles currently need maintenance.");
@@ -63,47 +66,108 @@ public class MaintenanceManager {
         System.out.println("\nVehicle Due for Maintenance:");
         System.out.println(next);
 
-        System.out.print("Enter Service Type (e.g. Oil Change): ");
-        String type = scanner.nextLine().trim();
+        while (true) {
+            // Get service type with validation
+            String[] serviceTypes = {"Oil Change", "Tire Replacement", "Brake Service", "Engine Repair", "Regular Service", "Other"};
+            System.out.println("\nSelect Service Type:");
+            for (int i = 0; i < serviceTypes.length; i++) {
+                System.out.println((i + 1) + ". " + serviceTypes[i]);
+            }
 
-        System.out.print("Enter Service Date (YYYY-MM-DD): ");
-        String date = scanner.nextLine().trim();
+            int serviceChoice = InputValidator.getValidMenuChoice("Enter choice (1-" + serviceTypes.length + "): ", 1, serviceTypes.length);
+            if (serviceChoice == -1) {
+                return;
+            }
 
-        System.out.print("Enter Parts Replaced: ");
-        String parts = scanner.nextLine().trim();
+            String type = serviceTypes[serviceChoice - 1];
+            if (type.equals("Other")) {
+                type = InputValidator.getValidString("Enter custom service type: ", 2, 50);
+                if (type.equals("BACK")) {
+                    return;
+                }
+            }
 
-        System.out.print("Enter Cost: ");
-        double cost = Double.parseDouble(scanner.nextLine().trim());
+            // Get service date with validation (past or current date for completed maintenance)
+            String date = InputValidator.getValidPastDate("Enter Service Date");
+            if (date.equals("BACK")) {
+                return;
+            }
 
-        System.out.print("Enter Next Scheduled Service Date (optional): ");
-        String nextServiceDate = scanner.nextLine().trim();
+            // Get parts replaced with validation
+            String parts = InputValidator.getValidString("Enter Parts Replaced (or 'None'): ", 1, 100);
+            if (parts.equals("BACK")) {
+                return;
+            }
 
-        Maintenance m = new Maintenance(
-                next.getRegistrationNumber(),
-                type, date, next.getMileage(),
-                parts, cost, nextServiceDate
-        );
+            // Get cost with validation
+            double cost = InputValidator.getValidCost("Enter Cost: $");
+            if (cost == -999.0) {
+                return;
+            }
 
-        allMaintenanceRecords.add(m);
-        FileHandler.saveMaintenance(allMaintenanceRecords);
-        System.out.println("Maintenance logged successfully.");
+            // Get next scheduled service date (optional) - must be future date
+            System.out.println("Next Scheduled Service Date (optional):");
+            System.out.println("1. Enter future date");
+            System.out.println("2. Skip");
+
+            int dateChoice = InputValidator.getValidMenuChoice("Enter choice (1-2): ", 1, 2);
+            if (dateChoice == -1) {
+                return;
+            }
+
+            String nextServiceDate = "";
+            if (dateChoice == 1) {
+                nextServiceDate = InputValidator.getValidFutureDate("Enter Next Scheduled Service Date");
+                if (nextServiceDate.equals("BACK")) {
+                    return;
+                }
+            }
+
+            try {
+                Maintenance m = new Maintenance(
+                        next.getRegistrationNumber(),
+                        type, date, next.getMileage(),
+                        parts, cost, nextServiceDate
+                );
+
+                allMaintenanceRecords.add(m);
+                FileHandler.saveMaintenance(allMaintenanceRecords);
+                InputValidator.showSuccess("Maintenance scheduled and logged successfully!");
+                return;
+
+            } catch (Exception e) {
+                if (!InputValidator.handleErrorAndAskRetry("Error scheduling maintenance: " + e.getMessage())) {
+                    return;
+                }
+            }
+        }
     }
 
     public void viewHistory() {
-        System.out.print("Enter Vehicle Reg No: ");
-        String regNo = scanner.nextLine().trim();
+        System.out.println("\n--- View Maintenance History ---");
 
-        boolean found = false;
-        System.out.println("\n--- Maintenance History for " + regNo + " ---");
-        for (Maintenance m : allMaintenanceRecords) {
-            if (m.getRegNo().equalsIgnoreCase(regNo)) {
-                System.out.println(m);
-                found = true;
+        while (true) {
+            String regNo = InputValidator.getValidString("Enter Vehicle Reg No: ", 1, 20);
+            if (regNo.equals("BACK")) {
+                return;
             }
-        }
 
-        if (!found) {
-            System.out.println("No maintenance records found for this vehicle.");
+            boolean found = false;
+            System.out.println("\n--- Maintenance History for " + regNo + " ---");
+            for (Maintenance m : allMaintenanceRecords) {
+                if (m.getRegNo().equalsIgnoreCase(regNo)) {
+                    System.out.println(m);
+                    found = true;
+                }
+            }
+
+            if (!found) {
+                if (!InputValidator.handleErrorAndAskRetry("No maintenance records found for this vehicle.")) {
+                    return;
+                }
+            } else {
+                return;
+            }
         }
     }
 
@@ -115,7 +179,6 @@ public class MaintenanceManager {
     }
 
     // === ALIASES FOR MainMenu.java compatibility ===
-
     public void scheduleMaintenance() {
         scheduleNextMaintenance();
     }

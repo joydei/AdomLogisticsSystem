@@ -7,6 +7,7 @@ import java.util.function.Predicate;
 public class LinkedList<T> implements Iterable<T> {
 
     private class Node {
+
         T data;
         Node next;
 
@@ -24,7 +25,9 @@ public class LinkedList<T> implements Iterable<T> {
             head = newNode;
         } else {
             Node cur = head;
-            while (cur.next != null) cur = cur.next;
+            while (cur.next != null) {
+                cur = cur.next;
+            }
             cur.next = newNode;
         }
         size++;
@@ -32,7 +35,9 @@ public class LinkedList<T> implements Iterable<T> {
 
     // Remove node by matching packageId inside toString (old version, you can remove this if unused)
     public boolean remove(String packageId) {
-        if (head == null) return false;
+        if (head == null) {
+            return false;
+        }
 
         if (head.data.toString().contains(packageId)) {
             head = head.next;
@@ -66,7 +71,9 @@ public class LinkedList<T> implements Iterable<T> {
             removedAny = true;
         }
 
-        if (head == null) return removedAny;
+        if (head == null) {
+            return removedAny;
+        }
 
         // Now remove nodes after head
         Node prev = head;
@@ -90,7 +97,9 @@ public class LinkedList<T> implements Iterable<T> {
     public T find(Predicate<T> condition) {
         Node current = head;
         while (current != null) {
-            if (condition.test(current.data)) return current.data;
+            if (condition.test(current.data)) {
+                return current.data;
+            }
             current = current.next;
         }
         return null;
@@ -126,12 +135,16 @@ public class LinkedList<T> implements Iterable<T> {
         return new Iterator<T>() {
             Node current = head;
 
+            @Override
             public boolean hasNext() {
                 return current != null;
             }
 
+            @Override
             public T next() {
-                if (!hasNext()) throw new NoSuchElementException();
+                if (!hasNext()) {
+                    throw new NoSuchElementException();
+                }
                 T data = current.data;
                 current = current.next;
                 return data;

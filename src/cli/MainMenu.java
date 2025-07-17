@@ -1,12 +1,12 @@
 package cli;
 
-import modules.VehicleManager;
-import modules.DriverManager;
-import modules.DeliveryManager;
-import modules.MaintenanceManager;
-import models.Vehicle;
-
 import java.util.*;
+import models.Vehicle;
+import modules.DeliveryManager;
+import modules.DriverManager;
+import modules.MaintenanceManager;
+import modules.VehicleManager;
+import utils.InputValidator;
 
 public class MainMenu {
 
@@ -18,21 +18,40 @@ public class MainMenu {
     private boolean running = true;
 
     public void launch() {
+        InputValidator.showInfo("Welcome to Adom Logistics Management System!");
+
         while (running) {
             showMainMenu();
-            int choice = getUserChoice(1, 6);
+            int choice = InputValidator.getValidMenuChoice("Enter your choice (1-6): ", 1, 6);
 
-            switch (choice) {
-                case 1 -> manageVehicles();
-                case 2 -> manageDrivers();
-                case 3 -> trackDeliveries();
-                case 4 -> scheduleMaintenance();
-                case 5 -> generateReports();
-                case 6 -> exitSystem();
+            if (choice == -1) {
+                // User typed 'back' on main menu, ask if they want to exit
+                if (InputValidator.askContinueOrBack("You are at the main menu. Do you want to exit the system?")) {
+                    continue; // Stay in main menu
+                } else {
+                    exitSystem();
+                    break;
+                }
             }
 
-            System.out.println("\nPress Enter to return to the menu...");
-            scanner.nextLine();
+            switch (choice) {
+                case 1 ->
+                    manageVehicles();
+                case 2 ->
+                    manageDrivers();
+                case 3 ->
+                    trackDeliveries();
+                case 4 ->
+                    scheduleMaintenance();
+                case 5 ->
+                    generateReports();
+                case 6 ->
+                    exitSystem();
+            }
+
+            if (running) {
+                InputValidator.waitForEnter();
+            }
         }
     }
 
@@ -45,20 +64,6 @@ public class MainMenu {
         System.out.println("5. Generate Reports");
         System.out.println("6. Exit");
         System.out.print("Enter your choice (1-6): ");
-    }
-
-    private int getUserChoice(int min, int max) {
-        try {
-            int choice = Integer.parseInt(scanner.nextLine().trim());
-            if (choice < min || choice > max) {
-                System.out.println("Please enter a valid option between " + min + " and " + max);
-                return -1;
-            }
-            return choice;
-        } catch (NumberFormatException e) {
-            System.out.println("Invalid input. Please enter a number.");
-            return -1;
-        }
     }
 
     private void manageVehicles() {
@@ -75,13 +80,20 @@ public class MainMenu {
             System.out.print("Enter your choice (1-6): ");
 
             switch (scanner.nextLine().trim()) {
-                case "1" -> vehicleManager.addVehicle();
-                case "2" -> vehicleManager.listVehicles();
-                case "3" -> vehicleManager.searchVehicle();
-                case "4" -> vehicleManager.listVehiclesSortedByMileage();
-                case "5" -> vehicleManager.searchByMileage();
-                case "6" -> inVehicleMenu = false;
-                default -> System.out.println("Invalid input. Please try again.");
+                case "1" ->
+                    vehicleManager.addVehicle();
+                case "2" ->
+                    vehicleManager.listVehicles();
+                case "3" ->
+                    vehicleManager.searchVehicle();
+                case "4" ->
+                    vehicleManager.listVehiclesSortedByMileage();
+                case "5" ->
+                    vehicleManager.searchByMileage();
+                case "6" ->
+                    inVehicleMenu = false;
+                default ->
+                    System.out.println("Invalid input. Please try again.");
             }
         }
     }
@@ -100,13 +112,20 @@ public class MainMenu {
             System.out.print("Enter your choice (1-6): ");
 
             switch (scanner.nextLine().trim()) {
-                case "1" -> driverManager.addDriver();
-                case "2" -> driverManager.listDrivers();
-                case "3" -> driverManager.searchDriverById();
-                case "4" -> driverManager.assignDriver();
-                case "5" -> driverManager.showAvailableDrivers();
-                case "6" -> inDriverMenu = false;
-                default -> System.out.println("Invalid input. Please try again.");
+                case "1" ->
+                    driverManager.addDriver();
+                case "2" ->
+                    driverManager.listDrivers();
+                case "3" ->
+                    driverManager.searchDriverById();
+                case "4" ->
+                    driverManager.assignDriver();
+                case "5" ->
+                    driverManager.showAvailableDrivers();
+                case "6" ->
+                    inDriverMenu = false;
+                default ->
+                    System.out.println("Invalid input. Please try again.");
             }
         }
     }
@@ -125,13 +144,20 @@ public class MainMenu {
             System.out.print("Enter your choice (1-6): ");
 
             switch (scanner.nextLine().trim()) {
-                case "1" -> deliveryManager.addDelivery();
-                case "2" -> deliveryManager.listDeliveries();
-                case "3" -> deliveryManager.searchByPackageId();
-                case "4" -> deliveryManager.updateDeliveryStatus();
-                case "5" -> deliveryManager.rerouteDelivery();
-                case "6" -> inDeliveryMenu = false;
-                default -> System.out.println("Invalid input. Please try again.");
+                case "1" ->
+                    deliveryManager.addDelivery();
+                case "2" ->
+                    deliveryManager.listDeliveries();
+                case "3" ->
+                    deliveryManager.searchByPackageId();
+                case "4" ->
+                    deliveryManager.updateDeliveryStatus();
+                case "5" ->
+                    deliveryManager.rerouteDelivery();
+                case "6" ->
+                    inDeliveryMenu = false;
+                default ->
+                    System.out.println("Invalid input. Please try again.");
             }
         }
     }
@@ -149,12 +175,18 @@ public class MainMenu {
             System.out.print("Enter your choice (1-5): ");
 
             switch (scanner.nextLine().trim()) {
-                case "1" -> maintenanceManager.scheduleMaintenance();
-                case "2" -> maintenanceManager.viewMaintenanceHistory();
-                case "3" -> maintenanceManager.viewNextVehicleDue();
-                case "4" -> maintenanceManager.showMaintenanceQueue();
-                case "5" -> inMaintenanceMenu = false;
-                default -> System.out.println("Invalid input. Try again.");
+                case "1" ->
+                    maintenanceManager.scheduleMaintenance();
+                case "2" ->
+                    maintenanceManager.viewMaintenanceHistory();
+                case "3" ->
+                    maintenanceManager.viewNextVehicleDue();
+                case "4" ->
+                    maintenanceManager.showMaintenanceQueue();
+                case "5" ->
+                    inMaintenanceMenu = false;
+                default ->
+                    System.out.println("Invalid input. Try again.");
             }
         }
     }
@@ -193,8 +225,12 @@ public class MainMenu {
         for (Vehicle v : vehicles) {
             double eff = v.getMileage() == 0 ? 0 : v.getFuelUsage() / (double) v.getMileage();
             System.out.printf("• %s | Type: %s | %.5f L/km", v.getRegistrationNumber(), v.getType(), eff);
-            if (eff > avgEfficiency * 1.2) System.out.print(" Inefficient");
-            if (eff < avgEfficiency * 0.8) System.out.print(" Efficient");
+            if (eff > avgEfficiency * 1.2) {
+                System.out.print(" Inefficient");
+            }
+            if (eff < avgEfficiency * 0.8) {
+                System.out.print(" Efficient");
+            }
             System.out.println();
         }
 
@@ -219,7 +255,9 @@ public class MainMenu {
                 }
             }
 
-            if (count == 0) continue;
+            if (count == 0) {
+                continue;
+            }
 
             double avg = groupTotal / count;
             System.out.printf("• %-10s → Average Efficiency: %.5f L/km\n", type, avg);
